@@ -1,0 +1,40 @@
+{
+  "name": "s3-cnpmcore",
+  "version": "1.0.0",
+  "description": "a s3 adapter for cnpmcore",
+  "main": "./lib/index.cjs.js",
+  "module": "./lib/index.esm.js",
+  "types": "./lib/index.d.ts",
+  "engines": {
+    "node": ">= 16.13.0"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "dev": "rollup -w -c",
+    "lint": "rome check --apply-suggested ./src ./test && rome format --write ./src ./test",
+    "build": "rollup -c",
+    "test": "cross-env TS_NODE_PROJECT='./test/tsconfig.test.json' mocha --config .mocharc.json test/**/*.test.ts"
+  },
+  "author": "hezhengxu",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.19",
+    "mocha": "^10.2.0",
+    "rollup": "^3.14.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "rome": "^11.0.0",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.2",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.290.0"
+  }
+}
