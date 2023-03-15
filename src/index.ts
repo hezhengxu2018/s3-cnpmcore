@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { S3 } from "@aws-sdk/client-s3";
+import { S3, S3ServiceException,NoSuchKey } from "@aws-sdk/client-s3";
 import { ClientConfiguration, UploadOptions, AppendOptions } from "./types/index";
 
 class S3v2Client {
@@ -42,9 +42,11 @@ class S3v2Client {
     if (oldBytes) {
       const oldBuffer = new Uint8Array(oldBytes);
       const newBytes = Buffer.concat([oldBuffer, Buffer.from(bytes)]);
+      await this.remove(options.key);
       return await this.uploadBytes(newBytes, options);
     } else {
       const newBytes = Buffer.from(bytes);
+      await this.remove(options.key);
       return await this.uploadBytes(newBytes, options);
     }
   }
@@ -52,9 +54,18 @@ class S3v2Client {
   async readBytes(key: string) {
     const _key = this.trimKey(key);
     try {
-      return (await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })).Body?.transformToByteArray();
+      const res = await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })
+      const uint8Array = await res.Body?.transformToByteArray();
+      if (uint8Array) {
+        return Buffer.from(uint8Array)
+      } else {
+        return undefined
+      }
     } catch (error) {
-      return undefined;
+      if (error instanceof NoSuchKey) {
+        return undefined;
+      }
+      throw error
     }
   }
 
@@ -69,18 +80,20 @@ class S3v2Client {
     try {
       await this.s3.headObject({ Bucket: this.config.bucket, Key: _key });
     } catch (error) {
-      if ((error as any) === 404) {
-        return undefined;
-      } else {
-        throw error;
+      if (error instanceof S3ServiceException) {
+        if (error.$metadata.httpStatusCode === 404) {
+          return undefined
+        }
+        throw error
       }
+      throw error
     }
     return (await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })).Body?.transformToWebStream();
   }
 
   async remove(key: string) {
     const _key = this.trimKey(key);
-    await this.s3.deleteObject({ Bucket: this.config.bucket, Key: _key });
+    return await this.s3.deleteObject({ Bucket: this.config.bucket, Key: _key });
   }
 
   async list(prefix: string) {
