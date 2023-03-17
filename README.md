@@ -1,4 +1,4 @@
-# s3v2-cnpmcore
+# s3-cnpmcore
 
 a S3 storage wrapper which based on @aws-sdk 3.x for [cnpmcore](https://github.com/cnpm/cnpmcore) 
 
