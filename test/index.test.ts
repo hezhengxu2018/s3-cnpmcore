@@ -7,10 +7,13 @@ import { ClientConfiguration } from "../src/types/index";
 import S3v2Client from "../src/index";
 const env = process.env;
 const s3Config: ClientConfiguration = {
-  region: "cn-east-2",
-  endpoint: "http://s3-cn-east-2.qiniucs.com",
-  credentials: { accessKeyId: "oitLdyP8BRz_a-7N0OSi0wT2esi9SlWgj06mtmPY", secretAccessKey: "n3zofdjUGsyb8ZT-k-teWeB0tA6ywEWVUr_sl-Q9" },
-  bucket: "npm-test"
+  region: env.S3_CLIENT_REGION,
+  endpoint: env.S3_CLIENT_ENDPOINT,
+  credentials: { 
+    accessKeyId: env.S3_CLIENT_ID!,
+    secretAccessKey: env.S3_CLIENT_SECRET!
+  },
+  bucket: env.S3_CLIENT_BUCKET!
 };
 
 describe("s3-cnpmcore", () => {
@@ -53,13 +56,14 @@ describe("s3-cnpmcore", () => {
   describe("appendBytes()", () => {
     it("should append ok", async () => {
       const deleteRes = await client.remove("hello/bar.txt")
+      console.log(new Date())
       console.log(deleteRes)
       let bytes0
       let counter = 0
       do {
         bytes0 = (await client.readBytes("hello/bar.txt"))?.toString('utf8')
         counter++
-        console.log(bytes0,counter)
+        console.log(new Date(),counter)
       } while (bytes0);
       assert.equal(bytes0,undefined);
       let res = await client.appendBytes("hello", { key: "hello/bar.txt" });
@@ -90,7 +94,7 @@ describe("s3-cnpmcore", () => {
     it("should get download stream ok", async () => {
       await client.uploadBytes("hello bar", { key: "hello/download-bar.tgz" });
       const dest = path.join(__dirname, "hello");
-      const stream = await client.createDownloadStream("hello/download-bar.tgz");
+      const stream = await client.createDownloadStream("hello/download-bar.tgz") as unknown as NodeJS.ReadableStream;
       const writeStream = createWriteStream(dest);
       stream && await pipeline(stream, writeStream);
       assert.equal(await fs.readFile(dest, "utf8"), "hello bar");
