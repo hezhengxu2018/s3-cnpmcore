@@ -41,12 +41,16 @@ class S3v2Client {
     if (oldBytes) {
       const oldBuffer = new Uint8Array(oldBytes);
       const newBytes = Buffer.concat([oldBuffer, Buffer.from(bytes)]);
-      await this.remove(options.key);
-      return await this.uploadBytes(newBytes, options);
+      await this.uploadBytes(newBytes, options);
+      return {
+        key: options.key,
+      };
     } else {
       const newBytes = Buffer.from(bytes);
-      await this.remove(options.key);
-      return await this.uploadBytes(newBytes, options);
+      await this.uploadBytes(newBytes, options);
+      return {
+        key: options.key,
+      };
     }
   }
 
@@ -103,9 +107,10 @@ class S3v2Client {
     });
   }
 
-  async url(key: string) {
+  url(key: string) {
     const _key = this.trimKey(key);
-    return `${this.config.endpoint}/${this.config.bucket}/${_key}`;
+    const endpointHost = new URL(this.config.endpoint).host;
+    return `http://${this.config.bucket}.${endpointHost}/${_key}`;
   }
 }
 

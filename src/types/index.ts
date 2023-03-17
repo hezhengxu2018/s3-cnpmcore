@@ -13,5 +13,6 @@ export interface UploadResult {
 }
 
 export interface ClientConfiguration extends S3ClientConfig {
+  endpoint: string;
   bucket: string;
 }
