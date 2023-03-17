@@ -9,11 +9,11 @@ const env = process.env;
 const s3Config: ClientConfiguration = {
   region: env.S3_CLIENT_REGION,
   endpoint: env.S3_CLIENT_ENDPOINT,
-  credentials: { 
+  credentials: {
     accessKeyId: env.S3_CLIENT_ID!,
-    secretAccessKey: env.S3_CLIENT_SECRET!
+    secretAccessKey: env.S3_CLIENT_SECRET!,
   },
-  bucket: env.S3_CLIENT_BUCKET!
+  bucket: env.S3_CLIENT_BUCKET!,
 };
 
 describe("s3-cnpmcore", () => {
@@ -30,8 +30,8 @@ describe("s3-cnpmcore", () => {
     it("should upload bytes OK", async () => {
       const bytesKey = "hello/cnpmcore-test-upload-bytes";
       let res = await client.uploadBytes("hello s3-cnpmcore", { key: bytesKey });
-      console.log("key:",res.key,bytesKey)
-      assert.equal(res.key ,bytesKey);
+      console.log("key:", res.key, bytesKey);
+      assert.equal(res.key, bytesKey);
       const bytes = await client.readBytes(bytesKey);
       assert(bytes);
       assert(bytes.toString() === "hello s3-cnpmcore");
@@ -55,24 +55,24 @@ describe("s3-cnpmcore", () => {
 
   describe("appendBytes()", () => {
     it("should append ok", async () => {
-      const deleteRes = await client.remove("hello/bar.txt")
-      console.log(new Date())
-      console.log(deleteRes)
-      let bytes0
-      let counter = 0
+      const deleteRes = await client.remove("hello/bar.txt");
+      console.log(new Date());
+      console.log(deleteRes);
+      let bytes0;
+      let counter = 0;
       do {
-        bytes0 = (await client.readBytes("hello/bar.txt"))?.toString('utf8')
-        counter++
-        console.log(new Date(),counter)
+        bytes0 = (await client.readBytes("hello/bar.txt"))?.toString("utf8");
+        counter++;
+        console.log(new Date(), counter);
       } while (bytes0);
-      assert.equal(bytes0,undefined);
+      assert.equal(bytes0, undefined);
       let res = await client.appendBytes("hello", { key: "hello/bar.txt" });
       assert(res.key === "hello/bar.txt");
-      const bytes1 = (await client.readBytes(res.key))?.toString('utf8')
+      const bytes1 = (await client.readBytes(res.key))?.toString("utf8");
       assert.equal(bytes1, "hello");
       res = await client.appendBytes(" world", { key: "hello/bar.txt" });
       assert(res.key === "hello/bar.txt");
-      const bytes2 = (await client.readBytes(res.key))?.toString()
+      const bytes2 = (await client.readBytes(res.key))?.toString();
       assert.equal(bytes2, "hello world");
       res = await client.appendBytes("\nagain", { key: "hello/bar.txt" });
       assert(res.key === "hello/bar.txt");
@@ -94,9 +94,9 @@ describe("s3-cnpmcore", () => {
     it("should get download stream ok", async () => {
       await client.uploadBytes("hello bar", { key: "hello/download-bar.tgz" });
       const dest = path.join(__dirname, "hello");
-      const stream = await client.createDownloadStream("hello/download-bar.tgz") as unknown as NodeJS.ReadableStream;
+      const stream = (await client.createDownloadStream("hello/download-bar.tgz")) as unknown as NodeJS.ReadableStream;
       const writeStream = createWriteStream(dest);
-      stream && await pipeline(stream, writeStream);
+      stream && (await pipeline(stream, writeStream));
       assert.equal(await fs.readFile(dest, "utf8"), "hello bar");
     });
 

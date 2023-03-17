@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { S3, S3ServiceException,NoSuchKey } from "@aws-sdk/client-s3";
+import { S3, S3ServiceException, NoSuchKey } from "@aws-sdk/client-s3";
 import { ClientConfiguration, UploadOptions, AppendOptions } from "./types/index";
 
 class S3v2Client {
@@ -21,8 +21,7 @@ class S3v2Client {
     if (typeof file === "string") {
       file = await fs.readFile(file);
     }
-    await this.s3
-      .putObject({ Bucket: this.config.bucket, Key: _key, Body: file, ContentLength: options.size });
+    await this.s3.putObject({ Bucket: this.config.bucket, Key: _key, Body: file, ContentLength: options.size });
     return { key: options.key };
   }
 
@@ -54,25 +53,25 @@ class S3v2Client {
   async readBytes(key: string) {
     const _key = this.trimKey(key);
     try {
-      const res = await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })
+      const res = await this.s3.getObject({ Bucket: this.config.bucket, Key: _key });
       const uint8Array = await res.Body?.transformToByteArray();
       if (uint8Array) {
-        return Buffer.from(uint8Array)
+        return Buffer.from(uint8Array);
       } else {
-        return undefined
+        return undefined;
       }
     } catch (error) {
       if (error instanceof NoSuchKey) {
         return undefined;
       }
-      throw error
+      throw error;
     }
   }
 
   async download(key: string, savePath: string) {
     const _key = this.trimKey(key);
     const res = await (await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })).Body?.transformToByteArray();
-    res && await fs.writeFile(savePath, res);
+    res && (await fs.writeFile(savePath, res));
   }
 
   async createDownloadStream(key: string) {
@@ -82,11 +81,11 @@ class S3v2Client {
     } catch (error) {
       if (error instanceof S3ServiceException) {
         if (error.$metadata.httpStatusCode === 404) {
-          return undefined
+          return undefined;
         }
-        throw error
+        throw error;
       }
-      throw error
+      throw error;
     }
     return (await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })).Body?.transformToWebStream();
   }
