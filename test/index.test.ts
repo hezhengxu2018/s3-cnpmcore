@@ -108,6 +108,13 @@ describe("s3-cnpmcore", () => {
     });
   });
 
+  describe("url", () => {
+    it('should return a string, not a Promise', ()=> {
+      const url = client.url("hello/url-foo.tgz");
+      assert.equal(typeof url, 'string')
+    })
+  });
+
   describe("list()", () => {
     it("should list ok", async () => {
       await client.upload(__filename, { key: "hello2222/upload.js" });
