@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { ClientConfiguration } from "../src/types/index";
-import S3v2Client from "../src/index";
+import S3Client from "../src/index";
 const env = process.env;
 const s3Config: ClientConfiguration = {
   region: env.S3_CLIENT_REGION,
@@ -17,7 +17,7 @@ const s3Config: ClientConfiguration = {
 };
 
 describe("s3-cnpmcore", () => {
-  const client = new S3v2Client(s3Config);
+  const client = new S3Client(s3Config);
 
   describe("upload() uploadBytes()", () => {
     it("should upload file ok", async () => {
