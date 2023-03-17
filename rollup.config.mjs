@@ -11,7 +11,7 @@ export default [
       entryFileNames: '[name].cjs.js',
     },
     plugins: [json(), resolve(), commonjs(), typescript()],
-    external:['aws-sdk/clients/s3']
+    external:['@aws-sdk/client-s3']
   }, {
     input: './src/index.ts',
     output: {
@@ -20,6 +20,6 @@ export default [
       entryFileNames: '[name].esm.js',
     },
     plugins: [json(), resolve(), commonjs(), typescript()],
-    external:['aws-sdk/clients/s3']
+    external:['@aws-sdk/client-s3']
   }
 ];
