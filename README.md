@@ -22,14 +22,18 @@ import S3Client from 's3-cnpmcore';
 // ...
 
 // api reference(https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html)
+// extend bucket item from https://github.com/aws/aws-sdk-js-v3/blob/7ff83c46fbab466fea1bed45af79d2f6e71b50f9/clients/client-s3/src/S3Client.ts#L698
 config.nfs.client = new S3Client({
   endpoint: 'endpoint',
   credentials: { 
     accessKeyId: 'your id',
     secretAccessKey: 'your access key'
   },
+  bucket: 'npm',
+  // optional
   region: '',
-  bucket: 'npm'
+  // optional
+  disableURL: true // default is false, set true when S3 provider can not provide anonymous url
 })
 ```
 
