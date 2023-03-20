@@ -109,10 +109,10 @@ describe("s3-cnpmcore", () => {
   });
 
   describe("url", () => {
-    it('should return a string, not a Promise', ()=> {
-      const url = client.url && client.url("hello/url-foo.tgz");
-      assert.equal(typeof url, 'string')
-    })
+    it("should return a string, not a Promise", () => {
+      const url = client.url?.("hello/url-foo.tgz");
+      assert.equal(typeof url, "string");
+    });
 
     it("should return undefined when disabled url", () => {
       s3Config.disableURL = true;

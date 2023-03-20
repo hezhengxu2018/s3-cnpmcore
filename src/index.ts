@@ -24,7 +24,13 @@ class S3v2Client {
     if (typeof file === "string") {
       file = await fs.readFile(file);
     }
-    await this.s3.putObject({ Bucket: this.config.bucket, Key: _key, Body: file, ContentLength: options.size });
+    await this.s3.putObject({
+      Bucket: this.config.bucket,
+      Key: _key,
+      Body: file,
+      ContentLength: options.size,
+      ACL: "public-read",
+    });
     return { key: options.key };
   }
 
@@ -112,9 +118,12 @@ class S3v2Client {
 
   public url: Function | undefined = (key: string) => {
     const _key = this.trimKey(key);
-    const endpointHost = new URL(this.config.endpoint).host;
-    return `http://${this.config.bucket}.${endpointHost}/${_key}`;
-  }
+    if (this.config.forcePathStyle) {
+      return `${this.config.endpoint}/${this.config.bucket}/${_key}`;
+    }
+    const { host: endpointHost, protocol } = new URL(this.config.endpoint);
+    return `${protocol}//${this.config.bucket}.${endpointHost}/${_key}`;
+  };
 }
 
 export default S3v2Client;
