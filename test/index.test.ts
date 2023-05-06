@@ -55,15 +55,19 @@ describe("s3-cnpmcore", () => {
   describe("appendBytes()", () => {
     it("should append ok", async () => {
       await client.remove("hello/bar.txt");
+      await new Promise(resolve => setTimeout(resolve, 1000));
       let res = await client.appendBytes("hello", { key: "hello/bar.txt" });
+      await new Promise(resolve => setTimeout(resolve, 1000));
       assert(res.key === "hello/bar.txt");
       const bytes1 = (await client.readBytes(res.key))?.toString("utf8");
       assert.equal(bytes1, "hello");
       res = await client.appendBytes(" world", { key: "hello/bar.txt" });
+      await new Promise(resolve => setTimeout(resolve, 1000));
       assert(res.key === "hello/bar.txt");
       const bytes2 = (await client.readBytes(res.key))?.toString();
       assert.equal(bytes2, "hello world");
       res = await client.appendBytes("\nagain", { key: "hello/bar.txt" });
+      await new Promise(resolve => setTimeout(resolve, 1000));
       assert(res.key === "hello/bar.txt");
       assert.equal((await client.readBytes(res.key))?.toString(), "hello world\nagain");
     });

@@ -1,4 +1,6 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
+import { Readable } from "node:stream";
+import type { ReadableStream as ReadableStreamWeb } from "node:stream/web";
 import { S3, S3ServiceException, NoSuchKey } from "@aws-sdk/client-s3";
 import { ClientConfiguration, UploadOptions, AppendOptions } from "./types/index";
 
@@ -100,7 +102,8 @@ class S3v2Client {
       }
       throw error;
     }
-    return (await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })).Body?.transformToWebStream();
+    const webStream = (await this.s3.getObject({ Bucket: this.config.bucket, Key: _key })).Body?.transformToWebStream();
+    return Readable.fromWeb(webStream as ReadableStreamWeb);
   }
 
   async remove(key: string) {
