@@ -14,6 +14,7 @@ const s3Config: ClientConfiguration = {
     secretAccessKey: env.S3_CLIENT_SECRET!,
   },
   bucket: env.S3_CLIENT_BUCKET!,
+  forcePathStyle: !!env.S3_CLIENT_FORCE_PATH_STYLE,
 };
 
 describe("s3-cnpmcore", () => {
